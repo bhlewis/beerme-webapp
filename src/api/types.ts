@@ -116,6 +116,20 @@ export interface InventoryWithBeer {
   days_old: number | null
 }
 
+export interface InventoryCreate {
+  beer_id: number
+  quantity: number
+  packaged_date?: string | null
+  purchase_price?: number | null
+}
+
+export interface InventoryUpdate {
+  beer_id?: number
+  quantity?: number
+  packaged_date?: string | null
+  purchase_price?: number | null
+}
+
 export interface ScanIn {
   upc_code: string
   packaged_date?: string
