@@ -32,7 +32,8 @@ src/
 │   ├── client.ts  # Axios instance with X-API-Key interceptor
 │   └── types.ts   # TypeScript interfaces matching API schemas
 ├── components/    # Reusable UI components
-│   ├── common/    # Modal, ConfirmDialog, FreshnessIndicator, etc.
+│   ├── common/    # Modal, ConfirmDialog, FreshnessIndicator, InventorySearch, BeerAutocomplete
+│   ├── inventory/ # InventoryFormModal for add/edit functionality
 │   └── layout/    # AppLayout, Sidebar
 ├── context/       # React Context (ApiKeyContext)
 ├── hooks/         # Custom hooks wrapping TanStack Query
@@ -44,11 +45,32 @@ src/
 All routes are prefixed with `/app`:
 - `/app` - Dashboard
 - `/app/scan` - Barcode scan in/out
-- `/app/inventory` - Current stock
+- `/app/inventory` - Current stock with search, add, edit, delete
 - `/app/beers`, `/app/breweries`, `/app/styles`, `/app/barcodes` - CRUD pages
 - `/app/transactions` - Activity history
 - `/app/analytics` - Charts and statistics
 - `/app/settings` - API configuration
+
+### Key Components
+
+#### InventorySearch (`components/common/InventorySearch.tsx`)
+Autocomplete search box for filtering inventory by beer name, brewery, or style. Features:
+- Categorized suggestions (Beers, Breweries, Styles)
+- Keyboard navigation (arrows, enter, escape)
+- Real-time client-side filtering
+
+#### BeerAutocomplete (`components/common/BeerAutocomplete.tsx`)
+Beer selection component with autocomplete. Used in inventory forms for selecting beers. Features:
+- Search by name, brewery, or style
+- Shows ABV, brewery, and style for each suggestion
+- Keyboard navigation support
+
+#### InventoryFormModal (`components/inventory/InventoryFormModal.tsx`)
+Modal dialog for adding/editing inventory items. Fields:
+- Beer (autocomplete)
+- Quantity
+- Packaged date
+- Purchase price
 
 ### API Integration
 - API key stored in localStorage (`beerme_api_key`)
