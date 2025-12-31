@@ -1,9 +1,13 @@
+/* Import a distinctive display font - must be first */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-stone-50 text-stone-900;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
 }
 
 /* Custom animations for search autocomplete */
@@ -33,4 +37,41 @@ body {
 
 .duration-150 {
   animation-duration: 150ms;
+}
+
+/* Search box glow effect */
+.search-box-container input:focus {
+  caret-color: theme('colors.amber.500');
+}
+
+/* Smooth table row transitions */
+table tbody tr {
+  @apply transition-colors duration-150;
+}
+
+/* Loading shimmer effect for tables */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    theme('colors.stone.100') 0%,
+    theme('colors.stone.50') 50%,
+    theme('colors.stone.100') 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Subtle noise texture overlay */
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
 }

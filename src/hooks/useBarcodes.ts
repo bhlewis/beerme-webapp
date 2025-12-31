@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { barcodesApi } from '../api/barcodes'
 import type { BarcodeCreate, BarcodeUpdate, BarcodesParams } from '../api/types'
 import toast from 'react-hot-toast'
@@ -7,6 +7,7 @@ export function useBarcodes(params?: BarcodesParams) {
   return useQuery({
     queryKey: ['barcodes', params],
     queryFn: () => barcodesApi.list(params),
+    placeholderData: keepPreviousData,
   })
 }
 

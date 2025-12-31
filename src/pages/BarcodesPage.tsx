@@ -3,9 +3,11 @@ import { useForm } from 'react-hook-form'
 import { useBarcodes, useCreateBarcode, useUpdateBarcode, useDeleteBarcode } from '../hooks/useBarcodes'
 import { useBeers } from '../hooks/useBeers'
 import { LoadingSpinner } from '../components/common/LoadingSpinner'
+import { SearchBox } from '../components/common/SearchBox'
 import { Modal } from '../components/common/Modal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
-import { Plus, Pencil, Trash2, Search } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
+import clsx from 'clsx'
 import type { BarcodeCreate, BarcodeWithBeer } from '../api/types'
 
 export function BarcodesPage() {
@@ -14,7 +16,7 @@ export function BarcodesPage() {
   const [editingBarcode, setEditingBarcode] = useState<BarcodeWithBeer | null>(null)
   const [deletingBarcode, setDeletingBarcode] = useState<BarcodeWithBeer | null>(null)
 
-  const { data: barcodes, isLoading } = useBarcodes({ beer_name: search || undefined })
+  const { data: barcodes, isLoading, isFetching } = useBarcodes({ beer_name: search || undefined })
   const { data: beers } = useBeers()
   const createMutation = useCreateBarcode()
   const updateMutation = useUpdateBarcode()
@@ -58,72 +60,97 @@ export function BarcodesPage() {
     }
   }
 
-  if (isLoading) {
+  // Show full-page loading only on initial load
+  if (isLoading && !barcodes) {
     return <LoadingSpinner size="lg" className="mt-20" />
   }
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Barcodes</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold text-stone-800 tracking-tight">Barcodes</h1>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-500"
+          className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-500/20 transition-all hover:bg-amber-600 hover:shadow-lg hover:shadow-amber-500/30 active:scale-[0.98]"
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           Add Barcode
         </button>
       </div>
 
-      <div className="mt-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by beer name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="block w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm"
-          />
-        </div>
+      <div className="mt-6 mb-8">
+        <SearchBox
+          placeholder="Search by beer name..."
+          value={search}
+          onChange={setSearch}
+          isLoading={isFetching && !!search}
+          className="max-w-md"
+        />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg bg-white shadow">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className={clsx(
+        'overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200/60',
+        'transition-opacity duration-200',
+        isFetching && 'opacity-70'
+      )}>
+        <table className="min-w-full divide-y divide-stone-200">
+          <thead className="bg-stone-50/80">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">UPC Code</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Beer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Container</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Units</th>
-              <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-stone-500">UPC Code</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-stone-500">Beer</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-stone-500">Container</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-stone-500">Units</th>
+              <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-stone-500">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="divide-y divide-stone-100 bg-white">
             {barcodes?.map((barcode) => (
-              <tr key={barcode.upc_code}>
-                <td className="whitespace-nowrap px-6 py-4 font-mono text-sm text-gray-900">{barcode.upc_code}</td>
+              <tr key={barcode.upc_code} className="group hover:bg-amber-50/50">
+                <td className="whitespace-nowrap px-6 py-4">
+                  <code className="rounded bg-stone-100 px-2 py-1 font-mono text-sm text-stone-700">
+                    {barcode.upc_code}
+                  </code>
+                </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <div>
-                    <div className="font-medium text-gray-900">{barcode.beer?.name ?? 'Unknown Beer'}</div>
-                    <div className="text-sm text-gray-500">{barcode.beer?.brewery?.name ?? 'Unknown Brewery'}</div>
+                    <div className="font-semibold text-stone-800">{barcode.beer?.name ?? 'Unknown Beer'}</div>
+                    <div className="text-sm text-stone-500">{barcode.beer?.brewery?.name ?? 'Unknown Brewery'}</div>
                   </div>
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{barcode.container_type}</td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{barcode.unit_count}</td>
-                <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                  <button onClick={() => openEditModal(barcode)} className="text-amber-600 hover:text-amber-900 mr-3">
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button onClick={() => setDeletingBarcode(barcode)} className="text-red-600 hover:text-red-900">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                <td className="whitespace-nowrap px-6 py-4">
+                  <span className="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-700">
+                    {barcode.container_type}
+                  </span>
+                </td>
+                <td className="whitespace-nowrap px-6 py-4">
+                  <span className="font-mono text-sm text-stone-600">{barcode.unit_count}</span>
+                </td>
+                <td className="whitespace-nowrap px-6 py-4 text-right">
+                  <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => openEditModal(barcode)}
+                      className="rounded-lg p-2 text-stone-400 transition-colors hover:bg-amber-100 hover:text-amber-600"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setDeletingBarcode(barcode)}
+                      className="rounded-lg p-2 text-stone-400 transition-colors hover:bg-red-100 hover:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        {barcodes?.length === 0 && <p className="py-8 text-center text-gray-500">No barcodes found</p>}
+        {barcodes?.length === 0 && (
+          <div className="py-12 text-center">
+            <p className="text-stone-400">No barcodes found</p>
+            {search && <p className="mt-1 text-sm text-stone-400">Try adjusting your search</p>}
+          </div>
+        )}
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingBarcode ? 'Edit Barcode' : 'Add Barcode'}>

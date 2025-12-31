@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { stylesApi } from '../api/styles'
 import type { StyleCreate, StyleUpdate, StylesParams } from '../api/types'
 import toast from 'react-hot-toast'
@@ -7,6 +7,7 @@ export function useStyles(params?: StylesParams) {
   return useQuery({
     queryKey: ['styles', params],
     queryFn: () => stylesApi.list(params),
+    placeholderData: keepPreviousData,
   })
 }
 

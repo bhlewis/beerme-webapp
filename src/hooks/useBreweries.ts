@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { breweriesApi } from '../api/breweries'
 import type { BreweryCreate, BreweryUpdate, BreweriesParams } from '../api/types'
 import toast from 'react-hot-toast'
@@ -7,6 +7,7 @@ export function useBreweries(params?: BreweriesParams) {
   return useQuery({
     queryKey: ['breweries', params],
     queryFn: () => breweriesApi.list(params),
+    placeholderData: keepPreviousData,
   })
 }
 
